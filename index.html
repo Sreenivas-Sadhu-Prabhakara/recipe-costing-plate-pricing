@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'; font-src 'self'; form-action 'self'">
+<title>Recipe costing and plate pricing calculator for kitchens · Open MSME</title>
+<meta name="description" content="Cost a recipe from the pack price you actually pay, convert purchase units to recipe units, count trim and cooking yield, cost a sauce once and use it in six dishes, then get the menu price your target food-cost percentage needs and the real food cost of the price you charge today.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="Recipe costing and plate pricing calculator for kitchens">
+<meta property="og:description" content="True cost of one plate — purchase units converted, yield loss counted, sub-recipes costed once — and the menu price your target food cost needs.">
+<meta property="og:type" content="website">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="assets/accent.css">
+<script src="assets/theme-init.js"></script>
+</head>
+<body>
+<header class="topbar">
+  <div class="wrap">
+    <a class="brand" href="./">
+      <span class="dot"></span>
+      <b>Open MSME</b>
+      <span class="tag">plate cost</span>
+    </a>
+    <span class="sp"></span>
+    <a class="home" href="https://sreenivas-sadhu-prabhakara.github.io/openmsme/">All tools</a>
+    <button class="themer" data-themer type="button">Theme</button>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="wrap">
+      <div class="eyebrow">Food processing &amp; F&amp;B · India &amp; Philippines</div>
+      <h1>Recipe costing and plate pricing calculator for kitchens</h1>
+      <p class="lede">Costs a recipe from the pack prices you actually pay — purchase units converted to recipe units, trim and cooking yield counted, a sauce costed once and shared across dishes — then gives the menu price your target food cost needs and the real food cost of the price you charge today.</p>
+      <div class="who">
+        <span class="pill">Cafes, cloud kitchens, caterers, QSR</span>
+        <span class="pill">Trade-practice costing, not a statutory calculation</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap">
+    <div class="cols calc">
+
+      <section class="card">
+        <h2>Inputs</h2>
+
+        <div class="field">
+          <label>Currency</label>
+          <div class="seg" role="group" aria-label="Currency">
+            <button type="button" data-cur="INR" aria-pressed="true">₹ INR</button>
+            <button type="button" data-cur="PHP" aria-pressed="false">₱ PHP</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Recipe <span class="hint">dishes are priced, preps are shared</span></label>
+          <div class="seg" id="recipeTabs" role="group" aria-label="Choose a recipe"></div>
+        </div>
+        <div class="btnrow">
+          <button class="btn ghost" id="addDish" type="button">+ Dish</button>
+          <button class="btn ghost" id="addPrep" type="button">+ Prep</button>
+          <button class="btn ghost" id="delRecipe" type="button">Delete this one</button>
+        </div>
+
+        <h3 id="recipeKind">Dish</h3>
+
+        <div class="field">
+          <label for="rName">Name</label>
+          <div class="inp"><input id="rName" type="text" autocomplete="off" placeholder="Chicken curry with rice"></div>
+        </div>
+
+        <div class="field">
+          <label for="rYieldQty" id="rYieldLabel">Batch serves <span class="hint">portions</span></label>
+          <div class="row2">
+            <input id="rYieldQty" type="number" min="0" step="any" inputmode="decimal">
+            <select id="rYieldUnit" aria-label="Batch yield unit"></select>
+          </div>
+        </div>
+
+        <div class="row2">
+          <div class="field">
+            <label for="rWastage">Wastage <span class="hint">spoilage, spillage</span></label>
+            <div class="inp has-suf"><span class="suf">%</span><input id="rWastage" type="number" min="0" step="any" inputmode="decimal"></div>
+          </div>
+          <div class="field">
+            <label for="rOther" id="rOtherLabel">Other direct cost <span class="hint">per plate: packaging, condiments</span></label>
+            <div class="inp has-pre"><span class="pre" data-cursym>₹</span><input id="rOther" type="number" min="0" step="any" inputmode="decimal"></div>
+          </div>
+        </div>
+
+        <div class="field" id="rPriceField">
+          <label for="rPrice">Your menu price <span class="hint">what you charge for one portion today</span></label>
+          <div class="inp has-pre"><span class="pre" data-cursym>₹</span><input id="rPrice" type="number" min="0" step="any" inputmode="decimal"></div>
+        </div>
+
+        <h3>Ingredients</h3>
+        <div id="lines"></div>
+        <div class="btnrow">
+          <button class="btn ghost" id="addLine" type="button">+ Ingredient</button>
+          <button class="btn ghost" id="addPrepLine" type="button">+ Use a prep</button>
+        </div>
+
+        <h3>Pricing rules</h3>
+        <div class="row2">
+          <div class="field">
+            <label for="pTarget">Target food cost <span class="hint">share of the price before tax</span></label>
+            <div class="inp has-suf"><span class="suf">%</span><input id="pTarget" type="number" min="0" step="any" inputmode="decimal"></div>
+          </div>
+          <div class="field">
+            <label for="pRound">Round prices up to <span class="hint">0 for the exact figure</span></label>
+            <div class="inp has-pre"><span class="pre" data-cursym>₹</span><input id="pRound" type="number" min="0" step="any" inputmode="decimal"></div>
+          </div>
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label for="pTax">GST / VAT on sales <span class="hint">your own rate; 0 if none</span></label>
+            <div class="inp has-suf"><span class="suf">%</span><input id="pTax" type="number" min="0" step="any" inputmode="decimal"></div>
+          </div>
+          <div class="field">
+            <label>Your menu price is</label>
+            <div class="seg" role="group" aria-label="Is the menu price inclusive of tax">
+              <button type="button" data-inc="0" aria-pressed="true">Before tax</button>
+              <button type="button" data-inc="1" aria-pressed="false">Tax included</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card sticky">
+        <h2>Result</h2>
+
+        <div class="result-primary" aria-live="polite">
+          <div class="k" id="pk">Plate cost per portion</div>
+          <div class="v" id="pv">—</div>
+          <div class="sub" id="ps">Add an ingredient to start.</div>
+        </div>
+
+        <table class="breakdown">
+          <thead>
+            <tr><th>Line</th><th class="num">Bought</th><th class="num">Cost</th></tr>
+          </thead>
+          <tbody id="lineRows"></tbody>
+        </table>
+
+        <h3>Price check</h3>
+        <table class="breakdown">
+          <tbody id="priceRows"></tbody>
+        </table>
+
+        <div class="note" id="warnBox" hidden></div>
+
+        <div class="btnrow">
+          <button class="btn ghost" id="print" type="button">Print / Save PDF</button>
+          <button class="btn ghost" id="reset" type="button">Reset</button>
+          <button class="btn ghost" id="example" type="button">Load example</button>
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <div class="wrap">
+    <section class="card">
+      <h2>Every dish, every prep</h2>
+      <p>Change one pack price and every dish that touches it moves here, in the same keystroke. That is the whole point of costing a prep once instead of six times.</p>
+      <table class="breakdown">
+        <thead>
+          <tr><th>Dish</th><th class="num">Plate cost</th><th class="num">Price</th><th class="num">Food cost</th></tr>
+        </thead>
+        <tbody id="menuRows"></tbody>
+      </table>
+      <h3>Preps</h3>
+      <table class="breakdown">
+        <thead>
+          <tr><th>Prep</th><th class="num">Cost</th><th class="num">Used by</th></tr>
+        </thead>
+        <tbody id="prepRows"></tbody>
+      </table>
+    </section>
+  </div>
+
+  <div class="wrap">
+    <section class="prose">
+      <h2>How it works</h2>
+      <p>Every line of a recipe is costed the same way:</p>
+      <p><code>line cost = (pack price ÷ pack size) × quantity needed, as purchased</code></p>
+      <p>Two things hide inside that sentence, and both of them quietly understate plate cost.</p>
+
+      <h3>The pack unit is not the recipe unit</h3>
+      <p>Rice is bought by the 25 kg sack and served 180 g at a time. Oil is bought by the 15 kg tin and ladled by the millilitre. So the quantity is converted before it meets the price — <code>180 g → 0.18 kg × ₹58/kg = ₹10.44</code> — and the conversion is refused outright when it is not physically defined. A pack priced by weight cannot meet a recipe written in millilitres unless you say how heavy a millilitre of it is, so the page asks for a density in grams per millilitre and will not guess one. Pieces never convert to grams at all: eggs bought by the tray of 30 have to be used as pieces.</p>
+
+      <h3>Yield divides, it never multiplies</h3>
+      <p>A kilo of bone-in chicken is not a kilo of meat on plates. If 150 g of trimmed chicken reaches the plate at a 72% yield, the kitchen had to take <code>150 ÷ 0.72 = 208 g</code> out of the cold room, and 208 g is what gets costed. Multiplying instead — <code>150 × 0.72 = 108 g</code> — is the usual mistake, and it understates every plate on the menu. On this page ₹240/kg chicken costs ₹50 a portion with yield counted and ₹36 without it: ₹14 a plate, every plate, for one wrong operator.</p>
+      <p>Yield above 100% is normal and works the same way, downward: rice, pasta and pulses drink water, so 4.5 kg of cooked rice at a 250% yield is <code>4.5 ÷ 2.5 = 1.8 kg</code> of raw rice bought. If your recipe is already written in raw quantities, switch the line to <b>as purchased</b> and nothing is grossed up.</p>
+
+      <h3>From batch to plate to price</h3>
+      <p><code>food cost = ingredients + wastage %</code> — wastage is an allowance on the food only, not on packaging.</p>
+      <p><code>batch cost = food cost + other direct costs</code> — packaging and condiments per plate for a dish, fuel per batch for a prep.</p>
+      <p><code>plate cost = batch cost ÷ portions the batch serves</code></p>
+      <p>Then the price, in both directions. Forwards: <code>suggested price = plate cost ÷ (target food cost % ÷ 100)</code>, rounded up, never down, so rounding can never push the food cost past the target. Backwards, from the price already printed on your menu: <code>your food cost % = plate cost ÷ price before tax × 100</code> and <code>gross margin per plate = price before tax − plate cost</code>. If your menu price includes GST or VAT, the tax is stripped out first — a tax-inclusive price flatters the food-cost percentage otherwise.</p>
+
+      <h3>A prep is costed once</h3>
+      <p>A base gravy, a stock, a spice paste or a chutney is a recipe in its own right: it has its own ingredients, its own wastage, its own batch yield in kilos or litres, and therefore its own cost per gram. Dishes then buy it by the gram at that cost. Preps can use other preps, to any depth. A loop — a prep that ends up using itself — is reported as a loop rather than costed, because there is no number at the end of it.</p>
+
+      <h2>How to use it</h2>
+      <ol class="steps">
+        <li>Pick a recipe, or add a dish. Type how many portions one batch serves — that single number divides everything.</li>
+        <li>Add each ingredient with the pack price and pack size <b>off the invoice</b>, not the price per kilo you remember.</li>
+        <li>Enter the quantity the recipe uses in whatever unit you actually measure in, then the usable yield for anything you trim, peel, bone, drain or boil.</li>
+        <li>Move the shared preparations into their own prep recipes and use them from the dishes. Cost them once.</li>
+        <li>Set your target food cost, read the suggested price, then type the price actually on your menu and read what it is really doing.</li>
+        <li>When a supplier raises a price, change that one line and watch every affected dish move in the table above.</li>
+      </ol>
+
+      <h2>What it refuses to do</h2>
+      <ul>
+        <li>Cost a line whose pack unit and recipe unit are not comparable, without a density you supply.</li>
+        <li>Divide by zero portions, zero yield, zero pack size or zero price — each of those is reported as the hole it is, never as a number.</li>
+        <li>Accept a target food cost of 0% or above 100%, which would price a plate at infinity or below its own cost.</li>
+        <li>Round a suggested price down.</li>
+        <li>Claim to know your tax rate, your wastage, or what your market will pay.</li>
+      </ul>
+
+      <details class="assumptions">
+        <summary>Assumptions &amp; rates</summary>
+        <p>No statute, licence or regulation fixes what a plate may cost or what a kitchen may charge, so nothing on this page is a legal figure. The defaults below are ordinary food-service rules of thumb, they are indicative only, and every one of them is a field you can edit.</p>
+        <ul>
+          <li><b>Target food cost 30%</b> of the price before tax. Kitchens commonly aim somewhere in the 25–35% band; delivery-only and full-service kitchens sit at different ends of it because their other costs differ. Use your own figure.</li>
+          <li><b>Wastage 5%</b> on the food cost, as an allowance for spoilage, spillage, over-portioning, staff tasting and trim that was meant to be used and was not. 3–8% is the band usually quoted. Weigh your own bin for a week and replace it.</li>
+          <li><b>Price rounding ₹5 / ₱5, upward.</b> Menu prices are normally printed as round figures. Set it to 0 for the exact number.</li>
+          <li><b>GST / VAT 0% by default.</b> No tax rate is assumed or asserted here. Whatever rate applies to your sales is yours to type in, along with whether your menu price already includes it.</li>
+          <li><b>Unit conversions.</b> Weight is based on the gram: 1 kg = 1000 g, 1 lb = 453.59237 g, 1 oz = 28.349523125 g. Volume is based on the millilitre: 1 l = 1000 ml. Household measures differ between countries, so the ones used here are stated outright — teaspoon 5 ml, tablespoon 15 ml, cup 250 ml. If yours differ, enter millilitres.</li>
+          <li><b>Densities</b> bridge a pack priced by weight and a recipe written in volume, and only when you enter one. For reference, water is about 1.00 g/ml, milk 1.03, cooking oil and ghee about 0.91, vinegar 1.01, soy sauce 1.20, honey 1.42. These are approximate kitchen figures, not measurements of your stock.</li>
+          <li><b>Portions are whatever you say they are.</b> The page has no view on how big a plate should be; it divides the batch by the number you give it.</li>
+        </ul>
+      </details>
+
+      <div class="note">What this page costs is food and other direct costs — the plate itself. It is not a profit-and-loss statement: rent, wages, electricity, gas beyond what you enter, delivery commission, packaging you forgot, and tax are not in the plate cost, and a healthy food-cost percentage is not the same thing as a profitable kitchen. The numbers are only as good as the pack prices, yields and portion counts you type in, and yields in particular are worth measuring in your own kitchen with your own suppliers rather than taken from any table. Nothing here is advice on tax, pricing law or labelling. Everything stays in your browser; nothing is uploaded, stored or sent anywhere.</div>
+    </section>
+  </div>
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <span>Open MSME · open-source tool for MSMEs in India &amp; the Philippines · MIT</span>
+    <span><a href="https://sreenivas-sadhu-prabhakara.github.io/openmsme/">All tools</a></span>
+  </div>
+</footer>
+
+<script src="assets/ui.js"></script>
+<script src="assets/costing.js"></script>
+<script src="assets/calc.js"></script>
+</body>
+</html>
